@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Word</title>
+    <script>
+        async function fetchServerInfo() {
+            try {
+                let response = await fetch("/api/server");
+                let data = await response.json();
+                document.getElementById("server-name").textContent = data.server;
+            } catch (error) {
+                console.error("Error fetching server info:", error);
+            }
+        }
+        window.onload = fetchServerInfo;
+    </script>
+</head>
+
+<body>
+    <h1>Hello Word!</h1>
+    <p>Server Name: <span id="server-name">Loading...</span></p>
+</body>
+
+</html>

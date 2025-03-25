@@ -1,0 +1,12 @@
+clients:
+  - id: 0121
+    subdomain: jorgito
+    domain: example.com
+
+  - id: 0122
+    subdomain: maria
+    domain: example.com
+
+  - id: 0123
+    subdomain: carlos
+    domain: example.com
