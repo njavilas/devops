@@ -6,7 +6,7 @@ ENV VIRTUAL_ENV=${WORKDIR}/venv
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 
 RUN apt-get update && \
-    apt-get install -y git pv locales default-mysql-client git bash-completion nano docker.io && \
+    apt-get install -y git pv locales default-mysql-client git bash-completion nano docker.io docker-compose && \
     rm -rf /var/lib/apt/lists/*
 
 RUN echo "es_AR.UTF-8 UTF-8" >>/etc/locale.gen && \
