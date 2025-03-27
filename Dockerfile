@@ -1,29 +1,28 @@
-FROM areapip/backend:v7.dev.arca
+FROM python:3.14-alpine
 
-USER root
+RUN apk add --no-cache sudo openssh-client git curl wget bash bash-completion shadow pv make build-base docker gcc musl-dev python3-dev glib glib-dev docker.io docker-compose
 
-RUN apt-get update && apt-get install -y \
-    curl net-tools lsof \
-    ca-certificates \
-    gnupg \
-    lsb-release
+RUN getent group docker || addgroup -S docker
 
-RUN mkdir -p /etc/apt/keyrings && \
-    curl -fsSL https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/gpg \
-    | tee /etc/apt/keyrings/docker.asc | gpg --dearmor
+RUN adduser -D -s /bin/bash vscode 
+RUN adduser vscode docker
 
-RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
-    https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]') \
-    $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list
-
-RUN apt-get update && apt-get install -y \
-    docker-ce \
-    docker-ce-cli \
-    containerd.io \
-    docker-compose-plugin
-
-RUN docker --version && docker compose version
+RUN echo "vscode ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/vscode
 
 USER vscode
 
-CMD ["bash"]
+RUN echo "source /usr/share/bash-completion/completions/git" >> /home/vscode/.bashrc
+
+WORKDIR /workspaces
+
+RUN curl -s https://api.github.com/repos/njavilas/githooks/releases/latest | \
+    grep "browser_download_url" | \
+    cut -d '"' -f 4 | \
+    xargs wget && \
+    chmod +x githooks
+
+COPY requirements.txt /tmp/requirements.txt
+
+RUN python3 -m venv /workspaces/venv 
+RUN /workspaces/venv/bin/pip install --upgrade pip
+RUN /workspaces/venv/bin/pip install --no-cache-dir -r /tmp/requirements.txt

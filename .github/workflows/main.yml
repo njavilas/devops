@@ -3,7 +3,7 @@ name: Publish Docker Image
 on:
   push:
     branches:
-      - v7 
+      - python-dind 
 
 jobs:
   build-and-push:
@@ -11,8 +11,8 @@ jobs:
 
     env:
       DOCKER_USERNAME: njavilas
-      DOCKER_VERSION: dev
-      DOCKER_NAME: v7-arca
+      DOCKER_VERSION: python-dind
+      DOCKER_NAME: dev
 
     steps:
       - name: Checkout repository
