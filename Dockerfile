@@ -3,7 +3,7 @@ FROM areapip/backend:v7.dev.arca
 USER root
 
 RUN apt-get update && apt-get install -y \
-    curl \
+    curl net-tools \
     ca-certificates \
     gnupg \
     lsb-release
