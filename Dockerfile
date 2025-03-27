@@ -1,4 +1,4 @@
-FROM python:3.14-alpine
+FROM python:3.13-alpine
 
 RUN apk add --no-cache sudo openssh-client git curl wget bash bash-completion shadow pv make build-base docker gcc musl-dev python3-dev glib glib-dev docker.io docker-compose
 
