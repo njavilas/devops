@@ -1,37 +1,29 @@
-FROM python:3.8.12
+FROM areapip/backend:v7.dev.arca
 
-ENV WORKDIR=/workspaces
+USER root
 
-ENV VIRTUAL_ENV=${WORKDIR}/venv
-ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+RUN apt-get update && apt-get install -y \
+    curl \
+    ca-certificates \
+    gnupg \
+    lsb-release
 
-RUN apt-get update && \
-    apt-get install -y git pv locales default-mysql-client git bash-completion nano docker.io docker-compose && \
-    rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/gpg \
+    | tee /etc/apt/keyrings/docker.asc | gpg --dearmor
 
-RUN echo "es_AR.UTF-8 UTF-8" >>/etc/locale.gen && \
-    locale-gen && \ 
-    locale
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
+    https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]') \
+    $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list
 
-ENV SHELL=/bin/bash
+RUN apt-get update && apt-get install -y \
+    docker-ce \
+    docker-ce-cli \
+    containerd.io \
+    docker-compose-plugin
 
-RUN useradd -ms /bin/bash vscode
-
-RUN echo "source /usr/share/bash-completion/completions/git" >> /home/vscode/.bashrc
+RUN docker --version && docker compose version
 
 USER vscode
 
-WORKDIR ${WORKDIR}
-
-RUN curl -s https://api.github.com/repos/njavilas/githooks/releases/latest | grep "browser_download_url" | cut -d '"' -f 4 | wget -i -
-
-RUN chmod +x githooks
-
-COPY requirements.txt /tmp/requirements.txt
-
-RUN python3 -m venv ${VIRTUAL_ENV}
-
-RUN chown -R vscode:vscode ${VIRTUAL_ENV}
-
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r /tmp/requirements.txt
+CMD ["bash"]
