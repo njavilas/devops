@@ -1,0 +1,42 @@
+{
+	"name": "Dynamic Zones Python",
+	"dockerFile": "Dockerfile",
+	"context": "..",
+	"runArgs": [
+		"--network",
+		"host",
+		"--env-file",
+		".devcontainer/.env",
+		"-v",
+		"/var/run/docker.sock:/var/run/docker.sock"
+	],
+	"postCreateCommand": "sudo chmod 666 /var/run/docker.sock && echo 'Welcome!! Ya puedes trabajar'",
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"terminal.integrated.shell.linux": "/bin/bash",
+				"python.defaultInterpreterPath": "/workspaces/venv/bin/python",
+				"python.analysis.autoSearchPaths": true,
+				"python.analysis.typeCheckingMode": "basic",
+				"python.analysis.autoImportCompletions": true,
+				"python.linting.enabled": true,
+				"python.linting.mypyEnabled": true,
+				"python.linting.pylintEnabled": false,
+				"python.linting.flake8Enabled": false,
+				"git.enabled": true,
+				"git.autofetch": true,
+				"git.confirmSync": false
+			},
+			"extensions": [
+				"ms-python.autopep8",
+				"ms-python.black-formatter",
+				"ms-python.debugpy",
+				"ms-python.isort",
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"streetsidesoftware.code-spell-checker"
+			]
+		}
+	},
+	"remoteUser": "vscode"
+}

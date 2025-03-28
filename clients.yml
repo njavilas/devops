@@ -1,0 +1,12 @@
+clients:
+  - id: b0121
+    subdomain: jorgito
+    domain: boxergestion.com
+
+  - id: b0122
+    subdomain: maria
+    domain: boxergestion.com
+
+  - id: b0123
+    subdomain: carlos
+    domain: boxergestion.com
