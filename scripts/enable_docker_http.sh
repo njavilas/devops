@@ -1,27 +1,36 @@
 #!/bin/bash
 
-set -e  # Habilita el modo de salida en caso de error
+set -e
 
-CONFIG_DIR="/etc/systemd/system/docker.service.d"
-CONFIG_FILE="$CONFIG_DIR/override.conf"
+echo "🔧 Configurando Docker para escuchar en HTTP (tcp://0.0.0.0:2375)..."
 
-# Crear el directorio de configuración si no existe
-sudo mkdir -p "$CONFIG_DIR"
+# Paso 1: Configurar daemon.json
+DAEMON_JSON="/etc/docker/daemon.json"
+echo "📄 Editando $DAEMON_JSON"
+cat > $DAEMON_JSON <<EOF
+{
+  "hosts": ["unix:///var/run/docker.sock", "tcp://0.0.0.0:2375"]
+}
+EOF
 
-# Escribir la configuración para habilitar HTTP en Docker
-echo "[Service]
+# Paso 2: Crear override systemd
+OVERRIDE_DIR="/etc/systemd/system/docker.service.d"
+OVERRIDE_CONF="$OVERRIDE_DIR/override.conf"
+
+echo "📁 Creando override en systemd"
+mkdir -p "$OVERRIDE_DIR"
+
+cat > "$OVERRIDE_CONF" <<EOF
+[Service]
 ExecStart=
-ExecStart=/usr/bin/dockerd -H unix:///var/run/docker.sock -H tcp://0.0.0.0:2375 --tls=false
-" | sudo tee "$CONFIG_FILE" > /dev/null
+ExecStart=/usr/bin/dockerd
+EOF
 
-# Recargar y reiniciar Docker
-sudo systemctl daemon-reload
-sudo systemctl restart docker
+# Paso 3: Recargar y reiniciar Docker
+echo "🔄 Recargando systemd y reiniciando Docker"
+systemctl daemon-reexec
+systemctl daemon-reload
+systemctl restart docker
 
-# Verificar si el puerto 2375 está activo
-if netstat -tulpn | grep -q ":2375"; then
-    echo "✅ Docker HTTP API habilitado en el puerto 2375"
-else
-    echo "❌ Error: No se pudo habilitar Docker HTTP API"
-    exit 1
-fi
+echo "✅ Docker ahora escucha en http://0.0.0.0:2375"
+echo "⚠️ No uses esto en producción sin TLS"
