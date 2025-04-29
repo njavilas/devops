@@ -1,0 +1,7 @@
+clients:
+  - id: bo121
+    subdomain: jorgito
+  - id: bo122
+    subdomain: maria
+  - id: bo123
+    subdomain: carlos

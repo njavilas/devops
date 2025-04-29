@@ -1,44 +1,97 @@
 services:
-  0095.backend:
+  b0210.backend:
     image: njavilas/helloword:go
     expose:
       - 8080
 
     environment:
-      - SERVER_NAME=0095
+      - SERVER_NAME=b0210
 
     networks:
-      example:
+      boxer:
         aliases:
-          - 0095.backend.example.net
+          - b0210.backend.boxer.net
 
-  0095.frontend:
+  b0210.frontend:
     image: njavilas/helloword:nginx
     expose:
       - 80
 
-    networks:
-      example:
-        aliases:
-          - 0095.frontend.example.net
+    environment:
+      - BACKEND_SERVER_NAME=b0210.backend.boxer.net
 
-  0095.proxy:
-    image: njavilas/proxy:nginx
-    ports:
-      - "7000:80"
+    networks:
+      boxer:
+        aliases:
+          - b0210.frontend.boxer.net
+
+  b0181.backend:
+    image: njavilas/helloword:go
+    expose:
+      - 8080
 
     environment:
-      - FRONTEND_SERVER_NAME=0095.frontend.example.net
-      - FRONTEND_SERVER_PORT=80
-
-      - BACKEND_SERVER_NAME=0095.backend.example.net
-      - BACKEND_SERVER_PORT=8080
+      - SERVER_NAME=b0181
 
     networks:
-      example:
+      boxer:
         aliases:
-          - 0095.example.net
+          - b0181.backend.boxer.net
 
+  b0181.frontend:
+    image: njavilas/helloword:nginx
+    expose:
+      - 80
+
+    environment:
+      - BACKEND_SERVER_NAME=b0181.backend.boxer.net
+
+    networks:
+      boxer:
+        aliases:
+          - b0181.frontend.boxer.net
+
+  b0072.backend:
+    image: njavilas/helloword:go
+    expose:
+      - 8080
+
+    environment:
+      - SERVER_NAME=b0072
+
+    networks:
+      boxer:
+        aliases:
+          - b0072.backend.boxer.net
+
+  b0072.frontend:
+    image: njavilas/helloword:nginx
+    expose:
+      - 80
+
+    environment:
+      - BACKEND_SERVER_NAME=b0072.backend.boxer.net
+
+    networks:
+      boxer:
+        aliases:
+          - b0072.frontend.boxer.net
+
+  proxy:
+    image: njavilas/reverseproxy:nginx
+    ports:
+      - 80:80
+      - 443:443
+
+    volumes:
+      - ./certs:/etc/letsencrypt
+      - ./clients.yml:/docker-entrypoint.d/clients.yml   
+
+    depends_on:
+      - b0210.frontend
+      - b0181.frontend
+      - b0072.frontend
+    
 networks:
-  example:
+  boxer:
     external: true
